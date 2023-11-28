@@ -2,6 +2,8 @@ version: 0.2
 phases:
   install:
     commands:
+      - BRANCH=`git rev-parse HEAD | xargs git name-rev | cut -d' ' -f2 | sed 's/remotes\/origin\///g'`
+      - git checkout $BRANCH
       - npm i
       - pip install --upgrade pip
       - pip install --upgrade awscli
@@ -16,4 +18,4 @@ phases:
   post_build:
     commands:
       - echo PostBuild Phase
-      - aws s3 cp ./dist/ $(echo $S3_BUCKET) --recursive
+      - aws s3 cp ./dist/ $(echo $S3_BUCKET)/$BRANCH --recursive
