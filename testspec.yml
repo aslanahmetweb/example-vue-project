@@ -1,22 +1,28 @@
 version: 0.2
 phases:
-  install:
-    commands:      
-      - BRANCH=`git rev-parse HEAD | xargs git name-rev | cut -d' ' -f2 | sed 's/remotes\/origin\///g'`
-      - S3_BUCKET_FOLDER=`git rev-parse HEAD | xargs git name-rev | cut -d' ' -f2 | sed 's/remotes\/origin\///g' | sed 's/^feature\///'`
-      - git checkout $BRANCH
-      - npm i
-      - pip install --upgrade pip
-      - pip install --upgrade awscli
-  pre_build:
-    commands:
-      - echo Pre_build Phase
-      - npm install
-  build:
-    commands:
-      - echo Build Phase
-      - npm run build
-  post_build:
-    commands:
-      - echo PostBuild Phase
-      - aws s3 cp ./dist/ $(echo $S3_BUCKET)/$S3_BUCKET_FOLDER --recursive
+    install:
+        commands:
+            - BRANCH=`git rev-parse HEAD | xargs git name-rev | cut -d' ' -f2 | sed 's/remotes\/origin\///g'`
+            - S3_BUCKET_FOLDER=`git rev-parse HEAD | xargs git name-rev | cut -d' ' -f2 | sed 's/remotes\/origin\///g' | sed 's/^feature\///'`
+            - git checkout $BRANCH
+            - npm i
+            - pip install --upgrade pip
+            - pip install --upgrade awscli
+    pre_build:
+        commands:
+            - echo Pre_build Phase Test
+            - npm install
+    build:
+        commands:
+            - echo Build Phase
+            - npm run build
+    post_build:
+        commands:
+            - echo PostBuild Phase
+            - aws s3 cp ./dist/ $(echo $S3_BUCKET) --recursive
+            - |
+                if [ "$BRANCH" == "develop" ]; then
+                  aws s3 cp ./dist/ $(echo $S3_BUCKET)/$BRANCH --recursive
+                else
+                  aws s3 cp ./dist/ $(echo $S3_BUCKET)/$S3_BUCKET_FOLDER --recursive
+                fi
