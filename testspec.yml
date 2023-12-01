@@ -19,7 +19,6 @@ phases:
     post_build:
         commands:
             - echo PostBuild Phase
-            - aws s3 cp ./dist/ $(echo $S3_BUCKET) --recursive
             - |
                 if [ "$BRANCH" == "develop" ]; then
                   aws s3 cp ./dist/ $(echo $S3_BUCKET)/$BRANCH --recursive
